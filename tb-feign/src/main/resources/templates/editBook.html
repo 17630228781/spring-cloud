@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css}"/>
+    <script th:src="@{../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js}"></script>
+    <script th:src="@{../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js}"></script>
+
+    <link rel="stylesheet" th:href="@{../js/bootstrap-fileinput/css/fileinput.css}"/>
+    <script th:src="@{../js/bootstrap-fileinput/js/fileinput.js}"></script>
+    <script th:src="@{../js/bootstrap-fileinput/js/locales/zh.js}"></script>
+    <script th:src="@{../js/bootstrap-fileinput/themes/gly/theme.js}"></script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <form id="bookForm"  class="form-horizontal">
+        <input type="hidden" name="id" th:value="${bookBean.id}">
+        <div class="form-group">
+            <label class="control-label col-sm-2">图书名称</label>
+            <div class="col-sm-4">
+                <input name="name" type="text" th:value="${bookBean.name}" class="form-control">
+            </div>
+            <label class="control-label col-sm-2">图书价格</label>
+            <div class="col-sm-4">
+                <input name="price" type="text" th:value="${bookBean.price}" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2">详情</label>
+            <div class="col-sm-4">
+                <input name="details" th:value="${bookBean.details}" type="text" class="form-control">
+            </div>
+            <label class="control-label col-sm-2">图书类型</label>
+            <div class="col-sm-4">
+                <select name="typeId" id="saveTypeSelect" class="form-control">
+                    <option value='-1'>--请选择--</option>
+                    <option th:each="type : ${typeBean}" th:selected="${type.id eq bookBean.typeId}" th:value="${type.id}"> <span th:text="${type.name}"></span> </option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2">出版时间</label>
+            <div class="col-sm-10">
+                <input name="timestamp" th:value="${bookBean.timestamp}" type="text" class="date form-control">
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+<script>
+    //时间插件
+    $('.date').datetimepicker({
+        language: 'zh-CN',//显示中文
+        format: 'yyyy-mm-dd',//显示格式
+        minView: "month",//设置只显示到月份
+        initialDate: new Date(),//初始化当前日期
+        autoclose: true,//选中自动关闭
+        todayBtn: true//显示今日按钮
+    });
+</script>
+</html>

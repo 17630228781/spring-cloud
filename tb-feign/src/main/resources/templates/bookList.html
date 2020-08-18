@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{../js/bootstrap3/css/bootstrap.css}">
+    <script th:src="@{../js/jquery-1.11.3.min.js}"></script>
+    <script th:src="@{../js/bootstrap3/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{../js/bootstrap-table/bootstrap-table.css}">
+    <script th:src="@{../js/bootstrap-table/bootstrap-table.js}"></script>
+    <script th:src="@{../js/bootstrap-table/locale/bootstrap-table-zh-CN.js}"></script>
+    <link rel="stylesheet" th:href="@{../js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css}">
+    <script th:src="@{../js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js}"></script>
+    <script th:src="@{../js/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js}"></script>
+    <script th:src="@{../js/bootstrap-bootbox/bootbox.all.min.js}"></script>
+</head>
+<body>
+    <div class="col-md-2">
+        <button onclick="saveBook()"  type='button' class='btn btn-block btn-primary glyphicon glyphicon-plus'> 新增</button>
+    </div>
+    <table class="table" id="bookTable"></table>
+</body>
+<script>
+    $(function(){
+        initBookTable();
+    })
+    //新增
+    function saveBook(){
+        var dialog = bootbox.dialog({
+            title: '<l class="glyphicon glyphicon-plus"><l>新增',
+            message: createContent('../toBookAdd'),
+            size: 'large',
+            buttons: {
+                cancel: {
+                    label: "取消",
+                    className: 'btn-danger glyphicon glyphicon-remove',
+                    callback: function(){
+                    }
+                },
+                ok: {
+                    label: "保存",
+                    className: 'btn-info glyphicon glyphicon-ok',
+                    callback: function(){
+                        saveBooks();
+                    }
+                }
+            }
+        });
+    }
+    //表单提交
+    function saveBooks(){
+        $.ajax({
+            url:'../saveBook',
+            type:'post',
+            data:$("#bookForm").serialize(),
+            dataType:'json',
+            success:function(data){
+                $('#bookTable').bootstrapTable('refresh');
+            }
+        })
+    }
+    //跳转结合页面
+    var res;
+    function createContent(url){
+        $.ajax({
+            url:url,
+            async:false,
+            success:function(data){
+                res = data;
+            }
+        });
+        return res;
+    }
+    //查询
+    function initBookTable(){
+        $('#bookTable').bootstrapTable({
+            url:'../findBookAllList',
+            method:'post',
+            contentType:'application/x-www-form-urlencoded',//post请求按照表单方式
+            columns:[
+                {checkbox:true},
+                {field:'id',title:'ID'},
+                {field:'name',title:'图书名称'},
+                {field:'price',title:'图书价格'},
+                {field:'details',title:'图书详情'},
+                {field:'typeName',title:'图书类型'},
+                {field:'timestamp',title:'图书出版时间'},
+                {field:'cz',title:'操作',formatter:function(value,row,index){
+                        return "<button onclick='deleteBook("+row.id+")'  type='reset' class='btn btn-danger btn-block glyphicon glyphicon-remove-sign'> 删除</button><button onclick='updateBook("+row.id+")'  type='reset' class='btn btn-success btn-block glyphicon glyphicon-pencil'> 修改</button>";
+                    }}
+            ]
+        })
+    }
+    //修改
+    function updateBook(id){
+        var dialog = bootbox.dialog({
+            title: '<l class="glyphicon glyphicon-pencil"><l>修改',
+            message: createContent('../toEditBookPage?id='+id),
+            size: 'large',
+            buttons: {
+                cancel: {
+                    label: "取消",
+                    className: 'btn-danger glyphicon glyphicon-remove',
+                    callback: function(){
+                    }
+                },
+                ok: {
+                    label: "保存",
+                    className: 'btn-info glyphicon glyphicon-ok',
+                    callback: function(){
+                        saveBooks();
+                    }
+                }
+            }
+        });
+    }
+    //删除
+    function deleteBook(ids) {
+        bootbox.confirm({
+            size: "small",
+            message: "您确定要删除本条信息吗?",
+            callback: function(result){
+                if (result) {
+                    //单个删除
+                    $.post('../deleteBook',{ids:ids},function(data){
+                        //刷新页面
+                        $('#bookTable').bootstrapTable('refresh');
+                    })
+                }else{
+                    bootbox.alert("您取消了删除");
+                }
+            }
+        })
+    }
+</script>
+</html>
